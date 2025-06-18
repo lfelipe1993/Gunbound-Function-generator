@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GunBound Function Generator</title>
+
+    <!-- Link para o Bootstrap via CDN -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Favicon (opcional) -->
+    <link rel="icon" href="gb.ico" type="image/x-icon">
+    <style>
+        /* Customizing the footer */
+        footer {
+            padding: 20px 0;
+        }
+
+        footer a {
+            color: #010114;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container mt-5">
+        <h1>Gunbound Function Generator</h1>
+
+        <div id="message"></div>
+
+        <form id="formContainer"></form>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script>
+        // Função para exibir o formulário para geração da função (equivalente a displayPre())
+    function displayPre() {
+        document.getElementById('formContainer').innerHTML = `
+            <form id="functionForm">
+                <div class="form-group">
+                    <input type="checkbox" class="form-check-label" name="enable_avatar" value="16"> Avatar On<p>
+                    
+                    <input class="form-check-label" type="checkbox" name="effect_force" value="8192" checked> Enable Force<br>
+                    <input class="form-check-label" type="checkbox" name="effect_tornado" value="16384" checked> Enable Hurricanes<br>
+                    <input class="form-check-label" type="checkbox" name="effect_lightning" value="32768" checked> Enable Lightning<br>
+                    <input class="form-check-label" type="checkbox" name="effect_windchange" value="65536" checked> Enable Wind<br>
+                    <input class="form-check-label" type="checkbox" name="effect_thor" value="131072" checked> Enable Thor<br>
+                    <input class="form-check-label" type="checkbox" name="effect_moon" value="262144" checked> Enable Moon<br>
+                    <input class="form-check-label" type="checkbox" name="effect_eclipse" value="524288" checked> Enable Itemlock<p>
+                    
+                    <input class="form-check-label" type="checkbox" name="event_enable1" value="1048576"> Enable Event 1<br>
+                    <input class="form-check-label" type="checkbox" name="event_enable2" value="2097152"> Enable Event 2<br>
+                    <input class="form-check-label" type="checkbox" name="event_enable3" value="4194304"> Enable Event 3<br>
+                    <input class="form-check-label" type="checkbox" name="event_enable4" value="8388608"> Enable Event 4<br>
+
+                    <p><button type="button" class="btn btn-primary" onclick="generateFunction()">Create function</button></p>
+                </div>
+            </form>
+            <p><button class="btn btn-primary" onclick="displayFull()">Show Full</button><p>
+        `;
+    }
+
+    // Função para exibir a lista completa de opções (equivalente a displayFull())
+    function displayFull() {
+        document.getElementById('formContainer').innerHTML = `
+            <form id="functionForm">
+                <input type="hidden" name="action" value="create">
+                <input type="checkbox" name="unknown_0" value="1"> Unknown 0<br>
+                <input type="checkbox" name="unknown_1" value="2"> Unknown 1<br>
+                <input type="checkbox" name="unknown_2" value="4"> Unknown 2<br>
+                <input type="checkbox" name="unknown_3" value="8"> Unknown 3<p>
+
+                <input type="checkbox" name="enable_avatar" value="16"> Avatar On<p>
+                
+                <input type="checkbox" name="unknown_5" value="32"> Unknown 5<br>
+                <input type="checkbox" name="unknown_6" value="64"> Unknown 6<br>
+                <input type="checkbox" name="unknown_7" value="128"> Unknown 7<br>
+                <input type="checkbox" name="unknown_8" value="256"> Unknown 8<br>
+                <input type="checkbox" name="unknown_9" value="512"> Unknown 9<br>
+                <input type="checkbox" name="unknown_10" value="1024"> Unknown 10<br>
+                <input type="checkbox" name="unknown_11" value="2048"> Unknown 11<br>
+                <input type="checkbox" name="unknown_12" value="4096"> Unknown 12<p>
+                
+                <input class="form-check-label" type="checkbox" name="effect_force" value="8192" checked> Enable Force<br>
+                <input class="form-check-label" type="checkbox" name="effect_tornado" value="16384" checked> Enable Hurricanes<br>
+                <input class="form-check-label" type="checkbox" name="effect_lightning" value="32768" checked> Enable Lightning<br>
+                <input class="form-check-label" type="checkbox" name="effect_windchange" value="65536" checked> Enable Wind<br>
+                <input class="form-check-label" type="checkbox" name="effect_thor" value="131072" checked> Enable Thor<br>
+                <input class="form-check-label" type="checkbox" name="effect_moon" value="262144" checked> Enable Moon<br>
+                <input class="form-check-label" type="checkbox" name="effect_eclipse" value="524288" checked> Enable Itemlock<p>
+
+                <input type="checkbox" name="event_enable1" value="1048576"> Enable Event 1<br>
+                <input type="checkbox" name="event_enable2" value="2097152"> Enable Event 2<br>
+                <input type="checkbox" name="event_enable3" value="4194304"> Enable Event 3<br>
+                <input type="checkbox" name="event_enable4" value="8388608"> Enable Event 4<br>
+                
+                <p><button type="button" class="btn btn-primary" onclick="generateFunction()">Create function</button></p>
+            </form>
+                <p><button class="btn btn-primary" onclick="displayPre()">Show Simple</button><p>
+        `;
+    }
+
+    // init - show default or list
+    window.onload = function() {
+        let urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('action') && urlParams.get('action') === "list") {
+            displayFull();
+        } else {
+            displayPre();
+        }
+    };
+
+
+        function generateFunction() {
+            // get all selected checkboxes
+            let checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            let total = 0;
+            
+            checkboxes.forEach(function(checkbox) {
+                total += parseInt(checkbox.value);
+            });
+
+            // Show result on div "message"
+            document.getElementById("message").innerHTML = "The function is: <b>" + total + "</b>";
+        }
+    </script>
+
+
+    <!-- Footer -->
+<footer class="mt-5">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-12">
+                <p>Gunbound Function Generator [Rebuild By KyLL3R] - The First PHP Version Was Designed By <b>Leo The Fox.</p>
+                <p>Developed by <a href="https://www.linkedin.com/in/lfelipemgr/" target="_blank">LFMG</a></p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>
